@@ -43,6 +43,9 @@ public class WebResource
     @PathParam("path") String path,
     @PathParam("query") String query)
   {
+	RequestPojo request = new RequestPojo(hostname_port, path, query);
+	this.serviceLayer.processRequest(request);
+	
   	return "<test>" + query + "</test>"; 
   }
 }
