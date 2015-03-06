@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Path("/urlinfo/1")
 public class WebResource 
 {
-  public Service serviceLayer;
+  private Service serviceLayer;
   
   public Service getService()
   {

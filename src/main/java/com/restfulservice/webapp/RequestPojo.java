@@ -9,10 +9,11 @@ public class RequestPojo
   
   public RequestPojo(String hostname_port, String path, String query)
   {
-  }
-  
-  private void optimizeRequestFormat()
-  {
+    String [] hostnameNport = hostname_port.split(":");
+    this.hostname = hostnameNport[0];
+    this.port = hostnameNport[1];
+    this.path = path;
+    this.query = query;
   }
 
   public String getHostname() {
