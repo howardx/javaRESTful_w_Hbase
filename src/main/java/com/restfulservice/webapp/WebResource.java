@@ -9,6 +9,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,14 +18,19 @@ import org.springframework.stereotype.Component;
 @Path("/urlinfo/1")
 public class WebResource 
 {
+  @Autowired
   private Service serviceLayer;
+  
+  public WebResource ()
+  {
+    serviceLayer = new Service();
+  };
   
   public Service getService()
   {
     return serviceLayer;
   }
   
-  @Autowired
   public void setService(Service serviceLayer)
   {
   	this.serviceLayer = serviceLayer;
@@ -60,10 +67,9 @@ public class WebResource
     @PathParam("query") String query,
     @PathParam("condition") String condition) throws IOException
   {
-	RequestPojo request = new RequestPojo(hostname_port, path, query);
-	this.serviceLayer.processRequest(request);
+	UpdateRequestPojo request = new UpdateRequestPojo(hostname_port, path, query, condition);
+	this.serviceLayer.updateRequest(request);
 	
-  	return "<test>" + condition + "</test>"; 
+  	return "<message>The URL lookup service was updated!</message>"; 
   }
-
 }

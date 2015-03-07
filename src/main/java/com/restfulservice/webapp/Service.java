@@ -2,18 +2,27 @@ package com.restfulservice.webapp;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class Service
 {
+  @Autowired
   private DBaccessLayer dba;
+  
+  public Service () 
+  {
+    dba = new DBaccessLayer();
+  };
   
   public DBaccessLayer getDba()
   {
     return dba;
   }
-  @Autowired
+  
   public void setDba(DBaccessLayer dba)
   {
     this.dba = dba;

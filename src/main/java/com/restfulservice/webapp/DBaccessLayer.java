@@ -16,61 +16,87 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DBaccessLayer
 {
   private Configuration conf;
   private HBaseAdmin admin;
   
-  public DBaccessLayer () throws MasterNotRunningException, ZooKeeperConnectionException
-  {
-    Configuration conf = HBaseConfiguration.create();
-    HBaseAdmin admin = new HBaseAdmin(conf);
+  @Autowired
+  private DBpersistenceLayer persistence;
+  
+  public DBpersistenceLayer getPersistence() {
+    return persistence;
   }
   
-  public Queryresponse prepareDBaccess(RequestPojo query) throws IOException
-  {
-    try
-    {
-      //HTableDescriptor desc = new HTableDescriptor("test_table");
-      //HColumnDescriptor cf = new HColumnDescriptor("cf".getBytes());
-      //desc.addFamily(cf);
-      //admin.createTable(desc); 
-      HTable table = new HTable(conf, "test_table");
-      Put put = new Put(Bytes.toBytes("test-key"));
-      put.add(Bytes.toBytes("cf"), Bytes.toBytes("q"), Bytes.toBytes("value"));
-      table.put(put);
-    }
-    finally
-    {
-      admin.close();
-    }	
-    return null;
+  public void setPersistence(DBpersistenceLayer persistence) {
+    this.persistence = persistence;
   }
 
+  public DBaccessLayer ()
+  {
+    persistence = new DBpersistenceLayer();
+    try
+    {
+	  DBinit();
+	}
+    catch (MasterNotRunningException | ZooKeeperConnectionException e)
+    {
+      e.printStackTrace();
+	}
+  }
+  
+  private void DBinit() throws MasterNotRunningException, ZooKeeperConnectionException
+  {
+    conf = HBaseConfiguration.create();
+    admin = new HBaseAdmin(conf);
+  }
+ 
+  public Queryresponse prepareDBaccess(RequestPojo query) throws IOException
+  {
+    HTable table = new HTable(conf, "urlInfo");
+    return null;
+  }
+ 
   public void prepareUpdateDBaccess(UpdateRequestPojo query) throws IOException
   {
     if (admin.tableExists("urlInfo"))
     {
-    	
+      /*
+       * creating a Htable object, will access existing Hbase table by name
+       */
+      HTable table = new HTable(conf, "urlInfo");
+      
+      HColumnDescriptor hcd = table.getTableDescriptor().getFamily(query.getPort().getBytes());
+      if (hcd == null)
+      {
+        HColumnDescriptor newColumnFamily = new HColumnDescriptor(query.getPort().getBytes());
+        
+        admin.disableTable(table.getTableName());
+        admin.addColumn(table.getTableName(), newColumnFamily);
+        admin.enableTable(table.getTableName());
+      }
+      
+      persistence.executeUpdates(table, query);
     }
     else
     {
-      try
-      {
-        HTableDescriptor desc = new HTableDescriptor("urlInfo");
-        HColumnDescriptor cf = new HColumnDescriptor("cf".getBytes());
-        desc.addFamily(cf);
-        admin.createTable(desc); 
-        HTable table = new HTable(conf, "urlInfo");
-        Put put = new Put(Bytes.toBytes("test-key"));
-        put.add(Bytes.toBytes("cf"), Bytes.toBytes("q"), Bytes.toBytes("value"));
-        table.put(put);
-      }
-      finally
-      {
-        admin.close();
-      }
+      /*
+       * new hbase table descriptor, for creating a new table in Hbase
+       */
+      HTableDescriptor hcd = new HTableDescriptor("urlInfo");
+      HColumnDescriptor columnFamily = new HColumnDescriptor(query.getPort().getBytes());
+      hcd.addFamily(columnFamily);
+      hcd.setReadOnly(false);
+      
+      admin.createTable(hcd);
+      
+      HTable table = new HTable(conf, "urlInfo");
+      
+      persistence.executeUpdates(table, query);
     }
   }
 }

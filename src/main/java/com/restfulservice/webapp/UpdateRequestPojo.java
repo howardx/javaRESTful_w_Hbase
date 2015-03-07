@@ -3,7 +3,7 @@ package com.restfulservice.webapp;
 public class UpdateRequestPojo extends RequestPojo
 {
   private String condition;
-  
+
   public UpdateRequestPojo(String hostname_port, String path, String query)
   {
     super(hostname_port, path, query);

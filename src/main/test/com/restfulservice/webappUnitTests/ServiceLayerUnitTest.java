@@ -1,4 +1,7 @@
 package com.restfulservice.webappUnitTests;
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
+
 import com.restfulservice.webapp.RequestPojo;
 import com.restfulservice.webapp.Service;
 
@@ -17,7 +20,7 @@ public class ServiceLayerUnitTest extends TestCase
     RESTfulReq = new RequestPojo(validHostname_port, validPath, validQuery);
   }
 
-  public void requestOptimizationTest()
+  public void requestOptimizationTest() throws MasterNotRunningException, ZooKeeperConnectionException
   {
     Service serv = new Service();
     serv.optimizeRequestFormat(RESTfulReq);
