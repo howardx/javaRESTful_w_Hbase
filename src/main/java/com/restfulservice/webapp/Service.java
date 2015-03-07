@@ -1,5 +1,7 @@
 package com.restfulservice.webapp;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -17,11 +19,20 @@ public class Service
     this.dba = dba;
   }
 
-  public Queryresponse processRequest(RequestPojo query)
+  // user query
+  public Queryresponse processRequest(RequestPojo query) throws IOException
   {
     optimizeRequestFormat(query);
     return dba.prepareDBaccess(query);
   }
+
+  // update Hbase 
+  public void updateRequest(UpdateRequestPojo query) throws IOException
+  {
+    optimizeRequestFormat(query);
+    dba.prepareUpdateDBaccess(query);
+  }
+
 
   /*
    * due to nature of Hbase

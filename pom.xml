@@ -82,11 +82,7 @@
 	</repositories>
 	<properties>
 		<spring.version>4.0.0.RELEASE</spring.version>
-		<jena.version>2.11.1</jena.version>
-		<arq.version>2.11.1</arq.version>
 		<tdb.version>1.0.1</tdb.version>
-		<larq.version>1.0.0-incubating</larq.version>
-		<iri.version>1.0.1</iri.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>

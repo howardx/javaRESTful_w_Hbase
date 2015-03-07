@@ -1,5 +1,7 @@
 package com.restfulservice.webapp;
 
+import java.io.IOException;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,11 +43,27 @@ public class WebResource
   public String urlService(@DefaultValue("")
     @PathParam("hostname_port") String hostname_port,
     @PathParam("path") String path,
-    @PathParam("query") String query)
+    @PathParam("query") String query) throws IOException
   {
 	RequestPojo request = new RequestPojo(hostname_port, path, query);
 	this.serviceLayer.processRequest(request);
 	
   	return "<test>" + query + "</test>"; 
   }
+  
+  @GET
+  @Path("/update/{hostname_port}/{path}/{query}/{condition}")
+  @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  public String updateService(@DefaultValue("")
+    @PathParam("hostname_port") String hostname_port,
+    @PathParam("path") String path,
+    @PathParam("query") String query,
+    @PathParam("condition") String condition) throws IOException
+  {
+	RequestPojo request = new RequestPojo(hostname_port, path, query);
+	this.serviceLayer.processRequest(request);
+	
+  	return "<test>" + condition + "</test>"; 
+  }
+
 }
