@@ -1,13 +1,13 @@
-package com.restfulservice.webapp;
+package com.restfulservice.GETrequestPOJOs;
 
-public class RequestPojo
+public abstract class RequestObject
 {
   private String hostname;
   private String path;
   private String port;
   private String query;
   
-  public RequestPojo(String hostname_port, String path, String query)
+  public RequestObject(String hostname_port, String path, String query)
   {
     String [] hostnameNport = hostname_port.split(":");
     this.hostname = hostnameNport[0];
@@ -47,5 +47,4 @@ public class RequestPojo
   public void setQuery(String query) {
   	this.query = query;
   }
-
 }

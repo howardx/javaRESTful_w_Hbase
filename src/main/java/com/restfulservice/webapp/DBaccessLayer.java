@@ -8,16 +8,12 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
-import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.restfulservice.GETrequestPOJOs.HbaseQueryObject;
 
 @Component
 public class DBaccessLayer
@@ -55,13 +51,19 @@ public class DBaccessLayer
     admin = new HBaseAdmin(conf);
   }
  
-  public Queryresponse prepareDBaccess(RequestPojo query) throws IOException
+  public String prepareDBaccess(HbaseQueryObject request) throws IOException
   {
     HTable table = new HTable(conf, "urlInfo");
-    return null;
+
+    HColumnDescriptor hcd = table.getTableDescriptor().getFamily(request.getColumnFamily());
+    if (hcd == null)
+    {
+      return "not found";
+    }
+    return persistence.executeSearch(table, request);
   }
  
-  public void prepareUpdateDBaccess(UpdateRequestPojo query) throws IOException
+  public void prepareUpdateDBaccess(HbaseQueryObject request) throws IOException
   {
     if (admin.tableExists("urlInfo"))
     {
@@ -70,17 +72,17 @@ public class DBaccessLayer
        */
       HTable table = new HTable(conf, "urlInfo");
       
-      HColumnDescriptor hcd = table.getTableDescriptor().getFamily(query.getPort().getBytes());
+      HColumnDescriptor hcd = table.getTableDescriptor().getFamily(request.getColumnFamily());
       if (hcd == null)
       {
-        HColumnDescriptor newColumnFamily = new HColumnDescriptor(query.getPort().getBytes());
+        HColumnDescriptor newColumnFamily = new HColumnDescriptor(request.getColumnFamily());
         
         admin.disableTable(table.getTableName());
         admin.addColumn(table.getTableName(), newColumnFamily);
         admin.enableTable(table.getTableName());
       }
       
-      persistence.executeUpdates(table, query);
+      persistence.executeUpdates(table, request);
     }
     else
     {
@@ -88,7 +90,7 @@ public class DBaccessLayer
        * new hbase table descriptor, for creating a new table in Hbase
        */
       HTableDescriptor hcd = new HTableDescriptor("urlInfo");
-      HColumnDescriptor columnFamily = new HColumnDescriptor(query.getPort().getBytes());
+      HColumnDescriptor columnFamily = new HColumnDescriptor(request.getColumnFamily());
       hcd.addFamily(columnFamily);
       hcd.setReadOnly(false);
       
@@ -96,7 +98,7 @@ public class DBaccessLayer
       
       HTable table = new HTable(conf, "urlInfo");
       
-      persistence.executeUpdates(table, query);
+      persistence.executeUpdates(table, request);
     }
   }
 }

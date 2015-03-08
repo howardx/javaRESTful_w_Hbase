@@ -9,10 +9,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.hadoop.hbase.MasterNotRunningException;
-import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.restfulservice.GETrequestPOJOs.SearchRequestPojo;
+import com.restfulservice.GETrequestPOJOs.UpdateRequestPojo;
+import com.restfulservice.GETresponsePOJOs.URLlookupServiceResponse;
 
 @Component
 @Path("/urlinfo/1")
@@ -47,15 +49,13 @@ public class WebResource
   @GET
   @Path("/{hostname_port}/{path}/{query}")
   @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-  public String urlService(@DefaultValue("")
+  public URLlookupServiceResponse urlService(@DefaultValue("")
     @PathParam("hostname_port") String hostname_port,
     @PathParam("path") String path,
     @PathParam("query") String query) throws IOException
   {
-	RequestPojo request = new RequestPojo(hostname_port, path, query);
-	this.serviceLayer.processRequest(request);
-	
-  	return "<test>" + query + "</test>"; 
+	SearchRequestPojo request = new SearchRequestPojo(hostname_port, path, query);
+	return this.serviceLayer.processRequest(request);
   }
   
   @GET

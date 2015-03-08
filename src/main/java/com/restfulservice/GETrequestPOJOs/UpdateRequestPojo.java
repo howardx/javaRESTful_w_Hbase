@@ -1,6 +1,7 @@
-package com.restfulservice.webapp;
+package com.restfulservice.GETrequestPOJOs;
 
-public class UpdateRequestPojo extends RequestPojo
+
+public class UpdateRequestPojo extends RequestObject 
 {
   private String condition;
 

@@ -2,10 +2,14 @@ package com.restfulservice.webapp;
 
 import java.io.IOException;
 
-import org.apache.hadoop.hbase.MasterNotRunningException;
-import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.restfulservice.GETrequestPOJOs.HbaseQueryObject;
+import com.restfulservice.GETrequestPOJOs.SearchRequestPojo;
+import com.restfulservice.GETrequestPOJOs.UpdateRequestPojo;
+import com.restfulservice.GETresponsePOJOs.Queryresponse;
+import com.restfulservice.GETresponsePOJOs.URLlookupServiceResponse;
 
 @Component
 public class Service
@@ -29,25 +33,22 @@ public class Service
   }
 
   // user query
-  public Queryresponse processRequest(RequestPojo query) throws IOException
+  public URLlookupServiceResponse processRequest(SearchRequestPojo query) throws IOException
   {
-    optimizeRequestFormat(query);
-    return dba.prepareDBaccess(query);
+    HbaseQueryObject request = new HbaseQueryObject(query);
+    String DBoutput = dba.prepareDBaccess(request);
+    return generateResponse(DBoutput);
+  }
+
+  private URLlookupServiceResponse generateResponse(String dBoutput)
+  {
+    return new URLlookupServiceResponse(dBoutput);
   }
 
   // update Hbase 
   public void updateRequest(UpdateRequestPojo query) throws IOException
   {
-    optimizeRequestFormat(query);
-    dba.prepareUpdateDBaccess(query);
-  }
-
-
-  /*
-   * due to nature of Hbase
-   */
-  public void optimizeRequestFormat(RequestPojo query)
-  {
-    query.setHostname(new StringBuffer(query.getHostname()).reverse().toString());
+    HbaseQueryObject request = new HbaseQueryObject(query);
+    dba.prepareUpdateDBaccess(request);
   }
 }
