@@ -1,1 +1,1 @@
-URL lookup service for Dave
+URL lookup service -  javaRESTful with Hbase
